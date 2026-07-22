@@ -283,6 +283,42 @@ def render_value_matrix(df, date_cols):
     )
     plot_df = df.loc[mask & df["Price Num"].notna() & df["Value Index"].notna() & (df["Image Source"] != "")].copy()
 
+debug_df = df.copy()
+debug_df["In Filter"] = mask
+debug_df["Has Price Num"] = debug_df["Price Num"].notna()
+debug_df["Has Value Index"] = debug_df["Value Index"].notna()
+debug_df["Has Image Source"] = debug_df["Image Source"].astype(str).str.strip() != ""
+debug_df["Shown In Plot"] = (
+    debug_df["In Filter"]
+    & debug_df["Has Price Num"]
+    & debug_df["Has Value Index"]
+    & debug_df["Has Image Source"]
+)
+
+st.write(
+    "Products not shown in scatter plot",
+    debug_df.loc[
+        ~debug_df["Shown In Plot"],
+        [
+            "Channel",
+            "Brand",
+            "Model Number",
+            "Price",
+            "Price Num",
+            "Capacity/mAh",
+            "Capacity Num",
+            "USB Power (Max)",
+            "USB Num",
+            "Image Source",
+            "In Filter",
+            "Has Price Num",
+            "Has Value Index",
+            "Has Image Source",
+        ],
+    ]
+)
+    
+
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Shown Products", f"{len(plot_df):,}")
     col2.metric("Available on Query Date", f"{plot_df['Availability on Query Date'].eq('available').sum():,}")
